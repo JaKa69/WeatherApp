@@ -24,7 +24,7 @@ const CurrentWeather = ({ data }) => {
     <View style={styles.container}>
       <Text style={styles.city}>{currentWeather.city}</Text>
       <ShowIcon icon={currentWeather.icon} size={100} />
-      <Text style={styles.temperature}>{currentWeather.temperature} °C</Text>
+      <Text style={styles.temperature}>{Math.round(currentWeather.temperature * 2) / 2} °C</Text>
       <Text style={styles.description}>{currentWeather.description}</Text>
     </View>
   );
