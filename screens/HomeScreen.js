@@ -1,5 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, ActivityIndicator, StyleSheet, TouchableOpacity } from 'react-native';
+import {
+  View,
+  Text,
+  ActivityIndicator,
+  StyleSheet,
+  TouchableOpacity,
+  ImageBackground,
+} from 'react-native';
 import * as Location from 'expo-location';
 import axios from 'axios';
 import { FontAwesome } from '@expo/vector-icons';
@@ -48,29 +55,50 @@ export default function HomeScreen() {
   };
 
   return (
-    <View style={styles.container}>
-      <TouchableOpacity onPress={getCurrentLocationWeather} style={styles.refreshButton}>
-        <FontAwesome name="location-arrow" size={24} color="white" />
-      </TouchableOpacity>
+    <ImageBackground source={require('../assets/background.jpg')} style={styles.background}>
+      <View style={styles.container}>
+        <TouchableOpacity onPress={getCurrentLocationWeather} style={styles.refreshButton}>
+          <FontAwesome name="location-arrow" size={24} color="white" />
+        </TouchableOpacity>
 
-      {loading && <ActivityIndicator size="large" color="#0000ff" />}
-      {errorMsg && <Text style={styles.error}>{errorMsg}</Text>}
-      {weatherData && (
-        <>
-          <CurrentWeather data={weatherData} />
-          <ScrollView horizontal>
-            <ForecastWeather data={weatherData} />
-          </ScrollView>
-        </>
-      )}
-    </View>
+        {loading && <ActivityIndicator size="large" color="#0000ff" />}
+        {errorMsg && <Text style={styles.error}>{errorMsg}</Text>}
+
+        {weatherData && (
+          <>
+            <View style={styles.currentWeatherWrapper}>
+              <CurrentWeather data={weatherData} />
+            </View>
+
+            <View style={styles.forecastBottom}>
+              <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                <ForecastWeather data={weatherData} />
+              </ScrollView>
+            </View>
+          </>
+        )}
+      </View>
+    </ImageBackground>
   );
 }
 
 const styles = StyleSheet.create({
+  background: {
+    flex: 1,
+    resizeMode: 'cover',
+  },
+  forecastBottom: {
+    maxHeight: 200,
+    marginBottom: 20,
+  },
+  currentWeatherWrapper: {
+    flex: 1,
+    justifyContent: 'flex-start',
+  },
   container: {
     padding: 16,
     flex: 1,
+    flexDirection:"column"
   },
   error: {
     color: 'red',
@@ -78,9 +106,9 @@ const styles = StyleSheet.create({
   },
   refreshButton: {
     alignSelf: 'flex-end',
-    marginBottom: 10,
     backgroundColor: '#007bff',
     padding: 10,
     borderRadius: 8,
+    marginTop: 30
   },
 });

@@ -33,7 +33,6 @@ const CurrentWeather = ({ data }) => {
 const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
-    marginVertical: 20,
   },
   city: {
     fontSize: 24,

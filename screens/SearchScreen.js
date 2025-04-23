@@ -1,5 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { View, TextInput, Button, Text, StyleSheet, FlatList, TouchableOpacity, ActivityIndicator } from 'react-native';
+import {
+  View,
+  TextInput,
+  Button,
+  Text,
+  StyleSheet,
+  FlatList,
+  TouchableOpacity,
+  ActivityIndicator,
+  ImageBackground,
+} from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import ForecastWeather from '../component/ForecastWeather';
@@ -12,6 +22,7 @@ export default function SearchScreen() {
   const [citySuggestions, setCitySuggestions] = useState([]);
   const [loading, setLoading] = useState(false);
   const [history, setHistory] = useState([]);
+  const [currentCityName, setCurrentCityName] = useState('');
 
   useEffect(() => {
     loadHistory();
@@ -56,6 +67,7 @@ export default function SearchScreen() {
           `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&lang=fr&units=metric&appid=${API_KEY}`
         );
         setWeatherData(response.data);
+        setCurrentCityName(name); // <- On affiche ce nom
         saveSearch(name);
         setCity('');
         setCitySuggestions([]);
@@ -68,50 +80,67 @@ export default function SearchScreen() {
   };
 
   return (
-    <View style={styles.container}>
-      <TextInput
-        placeholder="Entrez une ville"
-        value={city}
-        onChangeText={updateCitySuggestions}
-        style={styles.input}
-      />
-      <Button title="Rechercher" onPress={() => searchCityWeather()} />
-
-      {citySuggestions.length > 0 && (
-        <FlatList
-          data={citySuggestions}
-          keyExtractor={(item, index) => `${item.name}-${index}`}
-          renderItem={({ item }) => (
-            <TouchableOpacity onPress={() => searchCityWeather(item.name)}>
-              <Text style={styles.suggestionItem}>
-                {item.name}, {item.country}
-              </Text>
-            </TouchableOpacity>
-          )}
+    <ImageBackground source={require('../assets/background.jpg')} style={styles.background}>
+      <View style={styles.container}>
+        <TextInput
+          placeholder="Entrez une ville"
+          value={city}
+          onChangeText={updateCitySuggestions}
+          style={styles.input}
         />
-      )}
+        <Button title="Rechercher" onPress={() => searchCityWeather()} />
 
-      <Text style={styles.subtitle}>Dernières recherches :</Text>
-      {history.map((item, i) => (
-        <TouchableOpacity key={i} onPress={() => searchCityWeather(item)}>
-          <Text style={styles.historyItem}>• {item}</Text>
-        </TouchableOpacity>
-      ))}
+        {citySuggestions.length > 0 && (
+          <FlatList
+            data={citySuggestions}
+            keyExtractor={(item, index) => `${item.name}-${index}`}
+            renderItem={({ item }) => (
+              <TouchableOpacity onPress={() => searchCityWeather(item.name)}>
+                <Text style={styles.suggestionItem}>
+                  {item.name}, {item.country}
+                </Text>
+              </TouchableOpacity>
+            )}
+          />
+        )}
 
-      {loading && <ActivityIndicator />}
-      {weatherData && <ForecastWeather data={weatherData} />}
-    </View>
+        <Text style={styles.subtitle}>Dernières recherches :</Text>
+        {history.map((item, i) => (
+          <TouchableOpacity key={i} onPress={() => searchCityWeather(item)}>
+            <Text style={styles.historyItem}>• {item}</Text>
+          </TouchableOpacity>
+        ))}
+
+        {loading && <ActivityIndicator color="blue" style={{ marginTop: 20 }} />}
+
+        {weatherData && !loading && (
+          <>
+            <Text style={styles.cityName}>Prévisions pour : {currentCityName}</Text>
+            <ForecastWeather data={weatherData} />
+          </>
+        )}
+      </View>
+    </ImageBackground>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    padding: 16,
+  background: {
     flex: 1,
+    resizeMode: 'cover',
+  },
+  container: {
+    flex: 1,
+    padding: 16,
+    backgroundColor: 'rgba(255, 255, 255, 0.51)',
   },
   input: {
+    marginTop: 40,
     borderBottomWidth: 1,
     marginBottom: 10,
+    backgroundColor: 'white',
+    paddingHorizontal: 8,
+    borderRadius: 4,
   },
   suggestionItem: {
     padding: 8,
@@ -125,5 +154,11 @@ const styles = StyleSheet.create({
   historyItem: {
     paddingVertical: 4,
     fontStyle: 'italic',
+  },
+  cityName: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginVertical: 10,
+    textAlign: 'center',
   },
 });
