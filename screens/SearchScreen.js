@@ -67,7 +67,7 @@ export default function SearchScreen() {
           `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&lang=fr&units=metric&appid=${API_KEY}`
         );
         setWeatherData(response.data);
-        setCurrentCityName(name); // <- On affiche ce nom
+        setCurrentCityName(name);
         saveSearch(name);
         setCity('');
         setCitySuggestions([]);
